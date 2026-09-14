@@ -28,6 +28,7 @@ import com.velocitypowered.api.permission.Tristate;
 import com.velocitypowered.proxy.VelocityServer;
 import com.velocitypowered.proxy.adventure.ClickCallbackManager;
 import java.util.UUID;
+import net.kyori.adventure.text.Component;
 
 public class CallbackCommand implements BuiltinCommandDefinition {
 
@@ -48,6 +49,7 @@ public class CallbackCommand implements BuiltinCommandDefinition {
             .literalArgumentBuilder(label())
             .requires(source -> !server.getConfiguration().isCallbackPermission()
                     || source.getPermissionValue("velocity.command.callback") != Tristate.FALSE)
+            .executes(this::executeUsage)
             .then(BrigadierCommand.requiredArgumentBuilder("id", StringArgumentType.word())
                     .executes(this::execute))
             .build();
@@ -55,16 +57,44 @@ public class CallbackCommand implements BuiltinCommandDefinition {
     return new BrigadierCommand(node);
   }
 
+  private int executeUsage(CommandContext<CommandSource> context) {
+    if (server.getConfiguration().isCallbackOutput() && context.getSource().hasPermission("velocity.command.callback.output")) {
+      context.getSource().sendMessage(
+              Component.translatable("velocity.command.callback.usage", Component.text(label()))
+      );
+    }
+    return 0;
+  }
+
   private int execute(CommandContext<CommandSource> context) {
     String providedId = StringArgumentType.getString(context, "id");
     UUID id;
+
     try {
       id = UUID.fromString(providedId);
     } catch (IllegalArgumentException ignored) {
+      if (server.getConfiguration().isCallbackOutput() && context.getSource().hasPermission("velocity.command.callback.output")) {
+        context.getSource().sendMessage(
+                Component.translatable("velocity.command.callback.output.invalid", Component.text(providedId))
+        );
+      }
       return 0;
     }
 
-    ClickCallbackManager.INSTANCE.runCallback(context.getSource(), id);
-    return SINGLE_SUCCESS;
+    boolean success = ClickCallbackManager.INSTANCE.runCallback(context.getSource(), id);
+
+    if (server.getConfiguration().isCallbackOutput() && context.getSource().hasPermission("velocity.command.callback.output")) {
+      if (success) {
+        context.getSource().sendMessage(
+                Component.translatable("velocity.command.callback.output.success", Component.text(providedId))
+        );
+      } else {
+        context.getSource().sendMessage(
+                Component.translatable("velocity.command.callback.output.fail", Component.text(providedId))
+        );
+      }
+    }
+
+    return success ? SINGLE_SUCCESS : 0;
   }
 }
