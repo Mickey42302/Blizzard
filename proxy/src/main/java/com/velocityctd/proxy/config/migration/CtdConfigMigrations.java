@@ -144,6 +144,7 @@ public class CtdConfigMigrations {
             false
         ),
         migration("Blizzard Command Registration", "commands.ghelp-enabled", true),
+        migration(null, "commands.callback-permission", false),
 
         // [servers]
         migration(
