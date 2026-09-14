@@ -954,11 +954,13 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
       injector.inject(workingNode, this);
 
       // Omit the click-callback command from the client's command tree unless:
+      // - The 'callback-hidden' option is set to false, OR
       // - the client is 1.21.6+ (needs it to suppress the unknown-command confirmation prompt), AND
       // - at least one callback has been registered since proxy startup (i.e. some plugin is
       //   using the click-callback feature).
-      if (this.connection.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_21_6)
-          || !ClickCallbackManager.INSTANCE.hasHadRegistrations()) {
+      if (this.server.getConfiguration().isCallbackHidden()
+              && (this.connection.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_21_6)
+                      || !ClickCallbackManager.INSTANCE.hasHadRegistrations())) {
         workingNode.removeChildByName(ClickCallbackManager.COMMAND_LABEL);
       }
     }
