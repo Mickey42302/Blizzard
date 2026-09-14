@@ -148,8 +148,8 @@ import org.jetbrains.annotations.UnmodifiableView;
 @SuppressWarnings({"unchecked"})
 public class VelocityServer implements ProxyServer, ForwardingAudience {
 
-  public static final String VELOCITY_URL = "https://github.com/GemstoneGG/Velocity-CTD";
-  public static final String DISCORD_URL = "https://discord.gg/beer";
+  public static final String VELOCITY_URL = "https://github.com/Mickey42302/Blizzard";
+  public static final String DISCORD_URL = "https://discord.com/invite/YKdRqkH6Rt";
 
   private static final Logger LOGGER = LogManager.getLogger(VelocityServer.class);
 
