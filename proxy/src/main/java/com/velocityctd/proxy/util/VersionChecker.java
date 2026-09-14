@@ -81,10 +81,10 @@ public final class VersionChecker {
 
     int currentBuild = Integer.parseInt(matcher.group(1));
     try {
-      HttpURLConnection connection = (HttpURLConnection) URI.create("https://api.github.com/repos/GemstoneGG/Velocity-CTD/releases/latest").toURL().openConnection();
+      HttpURLConnection connection = (HttpURLConnection) URI.create("https://api.github.com/repos/Mickey42302/Blizzard/releases/latest").toURL().openConnection();
       connection.setConnectTimeout(5000);
       connection.setReadTimeout(5000);
-      connection.setRequestProperty("User-Agent", "Velocity-CTD/" + version + " (+https://github.com/GemstoneGG/Velocity-CTD)");
+      connection.setRequestProperty("User-Agent", "Blizzard/" + version + " (+https://github.com/Mickey42302/Blizzard)");
       connection.setRequestProperty("Accept", "application/vnd.github+json");
       connection.connect();
       if (connection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) {
@@ -127,23 +127,23 @@ public final class VersionChecker {
       } catch (Throwable t) {
         LOGGER.warn("Failed to perform startup version check", t);
       }
-    }, "Velocity-CTD Version Check");
+    }, "Blizzard Version Check");
     thread.setDaemon(true);
     thread.start();
   }
 
   private static void logVersionStatus(ProxyVersion version) {
     if (version.isDevelopmentVersion()) {
-      LOGGER.info("You are running a development build of Velocity-CTD.");
+      LOGGER.info("You are running a development build of Blizzard.");
       return;
     }
 
     int dist = fetchDistanceFromGitHub(version.getVersion());
     switch (dist) {
-      case DISTANCE_ERROR -> LOGGER.warn("There was an error when attempting to fetch Velocity-CTD's version information.");
-      case DISTANCE_UNKNOWN -> LOGGER.warn("Unable to fetch Velocity-CTD's version information.");
-      case DISTANCE_LATEST -> LOGGER.info("You are running the latest version of Velocity-CTD.");
-      default -> LOGGER.warn("You are {} release(s) behind. Consider updating Velocity-CTD.", dist);
+      case DISTANCE_ERROR -> LOGGER.warn("There was an error when attempting to fetch Blizzard's version information.");
+      case DISTANCE_UNKNOWN -> LOGGER.warn("Unable to fetch Blizzard's version information.");
+      case DISTANCE_LATEST -> LOGGER.info("You are running the latest version of Blizzard.");
+      default -> LOGGER.warn("You are {} release(s) behind. Consider updating Blizzard.", dist);
     }
   }
 }
