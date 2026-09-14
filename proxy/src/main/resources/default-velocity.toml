@@ -8,7 +8,7 @@ bind = "0.0.0.0:25565"
 # Supports the "{players}" placeholder (documented under "motd-hover") as well as the other
 # placeholders listed under "fallback-version-ping".
 motd = [
-    "<#ff3a4c>A Velocity-CTD Server"
+    "<#ff3a4c>A Blizzard Server"
 ]
 
 # Shown when hovering over the player count in the server list. Accepts a list of lines, and
@@ -378,7 +378,7 @@ allow-illegal-characters-in-chat = false
 server-brand = "{backend-brand} ({proxy-brand})"
 
 # Replaces what is returned for both the server brand and fallback version pinger.
-custom-brand-proxy = "Velocity-CTD"
+custom-brand-proxy = "Blizzard"
 
 # Replaces what is returned as the server brand for the user's client.
 custom-brand-backend = "Paper"
@@ -447,7 +447,7 @@ enabled = false
 port = 25565
 
 # This is the map name reported to the query services.
-map = "Velocity-CTD"
+map = "Blizzard"
 
 # Whether plugins should be shown in query response by default or not.
 show-plugins = false
@@ -602,14 +602,14 @@ minigames = 300
 #                       is not a placeholder. Enter a valid server in the scope.
 
 [server-links.GitHub]
-link = "https://github.com/GemstoneGG/Velocity-CTD"
+link = "https://github.com/Mickey42302/Blizzard"
 label = "<#ff3a4c>GitHub"
 server = [
     "all"
 ]
 
 [server-links.Discord]
-link = "https://discord.gg/beer"
+link = "https://discord.com/invite/YKdRqkH6Rt"
 label = "<#09add3>Discord"
 server = [
     "factions",
