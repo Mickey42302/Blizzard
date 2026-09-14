@@ -425,7 +425,7 @@ public class VelocityCommand implements BuiltinCommandDefinition {
 
         TextComponent embellishment = Component.text()
             .append(Component.text()
-                .content("discord.gg/beer")
+                .content("discord.com/invite/YKdRqkH6Rt")
                 .color(NamedTextColor.RED)
                 .clickEvent(ClickEvent.openUrl(VelocityServer.DISCORD_URL))
                 .build())
