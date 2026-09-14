@@ -143,6 +143,7 @@ public class CtdConfigMigrations {
             "commands.override-server-command-usage",
             false
         ),
+        migration("Blizzard Command Registration", "commands.ghelp-enabled", true),
 
         // [servers]
         migration(
