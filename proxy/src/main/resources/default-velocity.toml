@@ -163,6 +163,8 @@ shutdown-enabled-as-player = false
 # Blizzard Command Registration
 ghelp-enabled = true
 callback-permission = false
+callback-output = false
+callback-hidden = true
 
 # Whether to use the default "/server" output, or whether to override it with the "velocity.command.server.usage" key.
 override-server-command-usage = false
