@@ -17,6 +17,7 @@
 
 package com.velocitypowered.proxy;
 
+import com.blizzard.proxy.command.builtin.GhelpCommand;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
@@ -336,13 +337,13 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
     Package pkg = VelocityServer.class.getPackage();
     String implName = Optional.ofNullable(pkg)
         .map(Package::getImplementationTitle)
-        .orElse("Velocity-CTD");
+        .orElse("Blizzard");
     String implVersion = Optional.ofNullable(pkg)
         .map(Package::getImplementationVersion)
         .orElse("<unknown>");
     String implVendor = Optional.ofNullable(pkg)
         .map(Package::getImplementationVendor)
-        .orElse("Velocity(-CTD) Contributors");
+        .orElse("Mickey42302");
 
     return new ProxyVersion(implName, implVendor, implVersion);
   }
@@ -705,6 +706,7 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
     registerCommand(configuration.isAlertEnabled(), AlertCommand::new);
     registerCommand(configuration.isAlertRawEnabled(), AlertRawCommand::new);
     registerCommand(configuration.isFindEnabled(), FindCommand::new);
+    registerCommand(configuration.isGhelpEnabled(), GhelpCommand::new);
     registerCommand(configuration.isGkickEnabled(), GkickCommand::new);
     registerCommand(configuration.isGipEnabled(), GipCommand::new);
     registerCommand(configuration.isTransferEnabled(), TransferCommand::new);
