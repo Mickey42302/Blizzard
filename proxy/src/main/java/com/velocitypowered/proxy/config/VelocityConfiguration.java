@@ -1998,7 +1998,7 @@ public final class VelocityConfiguration implements ProxyConfig {
      * Allows advanced users to control execution of ClickEvent callbacks.
      */
     @Expose
-    private boolean callbackPermission = true;
+    private boolean callbackPermission = false;
 
     /**
      * Whether the /transfer command is enabled.
