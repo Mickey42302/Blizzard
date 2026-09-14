@@ -55,7 +55,7 @@ public class GhelpCommand implements BuiltinCommandDefinition {
   public BrigadierCommand build() {
     LiteralArgumentBuilder<CommandSource> rootNode = BrigadierCommand
             .literalArgumentBuilder(label())
-            .requires(source -> source.getPermissionValue("blizzard.command.ghelp") == Tristate.TRUE)
+            .requires(source -> source.getPermissionValue("blizzard.command.ghelp") != Tristate.FALSE)
             .executes(this::executeHelp);
 
     return new BrigadierCommand(rootNode);
