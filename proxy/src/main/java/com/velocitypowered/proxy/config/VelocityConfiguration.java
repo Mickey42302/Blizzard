@@ -770,6 +770,13 @@ public final class VelocityConfiguration implements ProxyConfig {
   }
 
   /**
+   * Whether the "/velocity:callback" command should check if you have a permission node.
+   */
+  public boolean isCallbackPermission() {
+    return commands.isCallbackPermission();
+  }
+
+  /**
    * Returns whether the <code>/shutdown</code> command can be used by a player.
    *
    * @return {@code true} if enabled
@@ -1987,6 +1994,13 @@ public final class VelocityConfiguration implements ProxyConfig {
     private boolean overrideServerCommandUsage = false;
 
     /**
+     * Whether a permission node is used for the /velocity:callback command.
+     * Allows advanced users to control execution of ClickEvent callbacks.
+     */
+    @Expose
+    private boolean callbackPermission = true;
+
+    /**
      * Whether the /transfer command is enabled.
      * Allows players to transfer between proxies in a multi-proxy setup.
      */
@@ -2019,6 +2033,7 @@ public final class VelocityConfiguration implements ProxyConfig {
         this.pingCommand = config.getOrElse("ping-enabled", true);
         this.sendCommand = config.getOrElse("send-enabled", true);
         this.overrideServerCommandUsage = config.getOrElse("override-server-command-usage", false);
+        this.callbackPermission = config.getOrElse("callback-permission", false);
         this.transferEnabled = config.getOrElse("transfer-enabled", true);
         this.shutdownEnabledAsPlayer = config.getOrElse("shutdown-enabled-as-player", false);
       }
@@ -2076,6 +2091,10 @@ public final class VelocityConfiguration implements ProxyConfig {
       return overrideServerCommandUsage;
     }
 
+    public boolean isCallbackPermission() {
+      return callbackPermission;
+    }
+
     public boolean isTransferEnabled() {
       return transferEnabled;
     }
@@ -2100,6 +2119,7 @@ public final class VelocityConfiguration implements ProxyConfig {
           .add("pingCommand", pingCommand)
           .add("sendCommand", sendCommand)
           .add("overrideServerCommandUsage", overrideServerCommandUsage)
+          .add("callbackPermission", callbackPermission)
           .add("transferEnabled", transferEnabled)
           .add("shutdownEnabledAsPlayer", shutdownEnabledAsPlayer)
           .toString();
