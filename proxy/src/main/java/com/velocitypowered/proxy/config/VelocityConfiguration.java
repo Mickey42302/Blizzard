@@ -777,6 +777,20 @@ public final class VelocityConfiguration implements ProxyConfig {
   }
 
   /**
+   * Whether the "/velocity:callback" command should print diagnostic messages.
+   */
+  public boolean isCallbackOutput() {
+    return commands.isCallbackOutput();
+  }
+
+  /**
+   * Whether the "/velocity:callback" command should be hidden by default.
+   */
+  public boolean isCallbackHidden() {
+    return commands.isCallbackHidden();
+  }
+
+  /**
    * Returns whether the <code>/shutdown</code> command can be used by a player.
    *
    * @return {@code true} if enabled
@@ -2081,6 +2095,19 @@ public final class VelocityConfiguration implements ProxyConfig {
     private boolean callbackPermission = false;
 
     /**
+     * Whether diagnostic output is printed by the /velocity:callback command.
+     * This is intended to be used for troubleshooting.
+     */
+    @Expose
+    private boolean callbackOutput = false;
+
+    /**
+     * Whether the /velocity:callback command should be hidden by default.
+     */
+    @Expose
+    private boolean callbackHidden = true;
+
+    /**
      * Whether the /transfer command is enabled.
      * Allows players to transfer between proxies in a multi-proxy setup.
      */
@@ -2114,6 +2141,8 @@ public final class VelocityConfiguration implements ProxyConfig {
         this.sendCommand = config.getOrElse("send-enabled", true);
         this.overrideServerCommandUsage = config.getOrElse("override-server-command-usage", false);
         this.callbackPermission = config.getOrElse("callback-permission", false);
+        this.callbackOutput = config.getOrElse("callback-output", false);
+        this.callbackHidden = config.getOrElse("callback-hidden", true);
         this.transferEnabled = config.getOrElse("transfer-enabled", true);
         this.shutdownEnabledAsPlayer = config.getOrElse("shutdown-enabled-as-player", false);
       }
@@ -2175,6 +2204,14 @@ public final class VelocityConfiguration implements ProxyConfig {
       return callbackPermission;
     }
 
+    public boolean isCallbackOutput() {
+      return callbackOutput;
+    }
+
+    public boolean isCallbackHidden() {
+      return callbackHidden;
+    }
+
     public boolean isTransferEnabled() {
       return transferEnabled;
     }
@@ -2200,6 +2237,8 @@ public final class VelocityConfiguration implements ProxyConfig {
           .add("sendCommand", sendCommand)
           .add("overrideServerCommandUsage", overrideServerCommandUsage)
           .add("callbackPermission", callbackPermission)
+          .add("callbackOutput", callbackOutput)
+          .add("callbackHidden", callbackHidden)
           .add("transferEnabled", transferEnabled)
           .add("shutdownEnabledAsPlayer", shutdownEnabledAsPlayer)
           .toString();
