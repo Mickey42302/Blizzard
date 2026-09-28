@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -28,6 +29,8 @@ import com.velocitypowered.proxy.VelocityServer;
 import com.velocitypowered.proxy.connection.MinecraftConnection;
 import com.velocitypowered.proxy.connection.backend.BackendConnectionPhase;
 import com.velocitypowered.proxy.connection.backend.VelocityServerConnection;
+import com.velocitypowered.proxy.protocol.StateRegistry;
+import com.velocitypowered.proxy.protocol.packet.ClientSettingsPacket;
 import com.velocitypowered.proxy.protocol.packet.ServerboundCustomClickActionPacket;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -38,6 +41,7 @@ import org.junit.jupiter.api.Test;
 
 class ClientConfigSessionHandlerTest {
 
+  private final ClientSettingsPacket settings = new ClientSettingsPacket();
   private VelocityServer server;
   private ConnectedPlayer player;
   private ClientConfigSessionHandler handler;
@@ -66,7 +70,7 @@ class ClientConfigSessionHandlerTest {
     VelocityServerConnection inFlight = mock(VelocityServerConnection.class);
     MinecraftConnection backend = mock(MinecraftConnection.class);
     when(player.getConnectionInFlightOrConnectedServer()).thenReturn(inFlight);
-    when(inFlight.ensureConnected()).thenReturn(backend);
+    when(inFlight.getConnection()).thenReturn(backend);
 
     ServerboundCustomClickActionPacket pkt = makePacket();
     assertTrue(handler.handle(pkt));
@@ -79,7 +83,7 @@ class ClientConfigSessionHandlerTest {
     VelocityServerConnection connected = mock(VelocityServerConnection.class);
     MinecraftConnection backend = mock(MinecraftConnection.class);
     when(player.getConnectionInFlightOrConnectedServer()).thenReturn(connected);
-    when(connected.ensureConnected()).thenReturn(backend);
+    when(connected.getConnection()).thenReturn(backend);
 
     ServerboundCustomClickActionPacket pkt = makePacket();
     assertTrue(handler.handle(pkt));
@@ -115,5 +119,37 @@ class ClientConfigSessionHandlerTest {
     assertEquals(refBefore + 1, pkt.refCnt());
     verify(backend).write(pkt);
     ReferenceCountUtil.release(pkt);
+  }
+
+  @Test
+  void forwardsSettingsArrivingAfterBackendConfigurationStarted() {
+    MinecraftConnection connection = backend(StateRegistry.CONFIG);
+    assertTrue(handler.handle(settings));
+    verify(player).setClientSettings(settings);
+    verify(connection).write(settings);
+  }
+
+  @Test
+  void forwardsSettingsWhenBackendAlreadyEnteredPlay() {
+    MinecraftConnection connection = backend(StateRegistry.PLAY);
+    assertTrue(handler.handle(settings));
+    verify(connection).write(settings);
+  }
+
+  @Test
+  void doesNotSendConfigurationPacketsDuringBackendLogin() {
+    MinecraftConnection connection = backend(StateRegistry.LOGIN);
+    assertTrue(handler.handle(settings));
+    verify(player).setClientSettings(settings);
+    verify(connection, never()).write(settings);
+  }
+
+  private MinecraftConnection backend(StateRegistry state) {
+    VelocityServerConnection backend = mock(VelocityServerConnection.class);
+    MinecraftConnection connection = mock(MinecraftConnection.class);
+    when(player.getConnectionInFlightOrConnectedServer()).thenReturn(backend);
+    when(backend.getConnection()).thenReturn(connection);
+    when(connection.getState()).thenReturn(state);
+    return connection;
   }
 }

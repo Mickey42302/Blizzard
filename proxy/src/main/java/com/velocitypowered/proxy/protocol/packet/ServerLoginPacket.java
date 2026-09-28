@@ -34,6 +34,8 @@ public class ServerLoginPacket implements MinecraftPacket {
 
   private static final QuietDecoderException EMPTY_USERNAME = new QuietDecoderException(
       "Empty username!");
+  private static final QuietDecoderException CONTROL_CHARACTER_USERNAME =
+      new QuietDecoderException("Username contains control characters!");
 
   private @Nullable String username;
   private @Nullable IdentifiedKey playerKey; // Introduced in 1.19.3
@@ -86,6 +88,9 @@ public class ServerLoginPacket implements MinecraftPacket {
     username = ProtocolUtils.readString(buf, 16);
     if (username.isEmpty()) {
       throw EMPTY_USERNAME;
+    }
+    if (containsControlCharacter(username)) {
+      throw CONTROL_CHARACTER_USERNAME;
     }
 
     if (version.noLessThan(ProtocolVersion.MINECRAFT_1_19)) {
@@ -178,5 +183,14 @@ public class ServerLoginPacket implements MinecraftPacket {
   @Override
   public boolean handle(MinecraftSessionHandler handler) {
     return handler.handle(this);
+  }
+
+  private static boolean containsControlCharacter(String username) {
+    for (int i = 0; i < username.length(); i++) {
+      if (Character.isISOControl(username.charAt(i))) {
+        return true;
+      }
+    }
+    return false;
   }
 }
