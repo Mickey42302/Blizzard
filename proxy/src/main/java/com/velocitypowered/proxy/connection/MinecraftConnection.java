@@ -47,6 +47,7 @@ import com.velocitypowered.proxy.protocol.MinecraftPacket;
 import com.velocitypowered.proxy.protocol.ProtocolUtils;
 import com.velocitypowered.proxy.protocol.StateRegistry;
 import com.velocitypowered.proxy.protocol.VelocityConnectionEvent;
+import com.velocitypowered.proxy.protocol.netty.InboundHoldHandler;
 import com.velocitypowered.proxy.protocol.netty.MinecraftCipherDecoder;
 import com.velocitypowered.proxy.protocol.netty.MinecraftCipherEncoder;
 import com.velocitypowered.proxy.protocol.netty.MinecraftCompressDecoder;
@@ -747,6 +748,28 @@ public class MinecraftConnection extends ChannelInboundHandlerAdapter {
     }
   }
 
+  /**
+   * Runs a protocol step that writes a packet asking the peer to change state and then switches
+   * this connection to that state, holding back whatever reaches the decoder meanwhile until the
+   * step is done. A handler in the pipeline may answer the packet before its write returns, and the
+   * answer is then decoded and handled in the state the step switched to.
+   *
+   * @param step the step to run
+   */
+  public void holdInboundDuring(Runnable step) {
+    ensureInEventLoop();
+
+    this.channel.pipeline().addBefore(MINECRAFT_DECODER, Connections.INBOUND_HOLD,
+        new InboundHoldHandler());
+    try {
+      step.run();
+    } finally {
+      if (this.channel.pipeline().get(Connections.INBOUND_HOLD) != null) {
+        this.channel.pipeline().remove(Connections.INBOUND_HOLD);
+      }
+    }
+  }
+
   public ProtocolVersion getProtocolVersion() {
     return protocolVersion;
   }
@@ -759,8 +782,13 @@ public class MinecraftConnection extends ChannelInboundHandlerAdapter {
   public void setProtocolVersion(ProtocolVersion protocolVersion) {
     ensureInEventLoop();
 
-    boolean changed = this.protocolVersion != protocolVersion;
+    final boolean changed = this.protocolVersion != protocolVersion;
     this.protocolVersion = protocolVersion;
+    final MinecraftVarintFrameDecoder frameDecoder = this.channel.pipeline()
+        .get(MinecraftVarintFrameDecoder.class);
+    if (frameDecoder != null) {
+      frameDecoder.setProtocolVersion(protocolVersion);
+    }
     if (protocolVersion != ProtocolVersion.LEGACY) {
       this.channel.pipeline().get(MinecraftEncoder.class).setProtocolVersion(protocolVersion);
       this.channel.pipeline().get(MinecraftDecoder.class).setProtocolVersion(protocolVersion);
@@ -858,6 +886,12 @@ public class MinecraftConnection extends ChannelInboundHandlerAdapter {
   public void setCompressionThreshold(int threshold) {
     ensureOpen();
     ensureInEventLoop();
+
+    final MinecraftVarintFrameDecoder frameDecoder = channel.pipeline()
+        .get(MinecraftVarintFrameDecoder.class);
+    if (frameDecoder != null) {
+      frameDecoder.setCompressionEnabled(threshold != -1);
+    }
 
     if (threshold == -1) {
       final ChannelHandler removedDecoder = channel.pipeline().remove(COMPRESSION_DECODER);
